@@ -21,13 +21,11 @@ int Controller::Gui()
         return EXIT_FAILURE;
     }
 
-    GUIApp* pGui = nullptr;
-    Gtk::Button* pBtn_view = nullptr;
-    Gtk::Button* pBtn_clean = nullptr;
-
+    pGui = nullptr;
     pBtn_insert = nullptr;
     pBtn_update = nullptr;
     pBtn_delete = nullptr;
+    pBtn_clean = nullptr;
     pLbl_id = nullptr;
     pLbl_inform = nullptr;
     pLbl_status = nullptr;
@@ -40,7 +38,6 @@ int Controller::Gui()
     refBuilder->get_widget("btn_insert", pBtn_insert);
     refBuilder->get_widget("btn_update", pBtn_update);
     refBuilder->get_widget("btn_delete", pBtn_delete);
-    refBuilder->get_widget("btn_view", pBtn_view);
     refBuilder->get_widget("btn_clean", pBtn_clean);
     refBuilder->get_widget("lbl_id", pLbl_id);
     refBuilder->get_widget("lbl_inform", pLbl_inform);
@@ -65,11 +62,6 @@ int Controller::Gui()
             &Controller::gui_delete));
     }
 
-    if (pBtn_view) {
-        pBtn_view->signal_clicked().connect(sigc::mem_fun(*this,
-            &Controller::gui_view));
-    }
-
     if (pBtn_clean) {
         pBtn_clean->signal_clicked().connect(sigc::mem_fun(*this,
             &Controller::gui_clean));
@@ -92,8 +84,8 @@ int Controller::Gui()
     delete pBtn_insert;
     delete pBtn_update;
     delete pBtn_delete;
-    delete pBtn_view;
     delete pBtn_clean;
+    delete pLbl_id;
     delete pLbl_inform;
     delete pLbl_status;
     delete pTxt_first_name;
@@ -107,12 +99,15 @@ int Controller::Gui()
 
 void Controller::gui_insert()
 {
-    string first_name = pTxt_first_name->get_text();
-    string last_name = pTxt_last_name->get_text();
-    string email = pTxt_email->get_text();
+    string exp_name = "^[a-zA-ZãÃâÂáÁàÀäÄẽẼêÊéÉèÈëËĩĨîÎíÍìÌïÏôÔõÕóÓòÒöÖũŨúÚùÙûÛüÜçÇ' ']+$";
+    string first_name = prepare(pTxt_first_name->get_text(), exp_name);
+    string last_name = prepare(pTxt_last_name->get_text(), exp_name);
+
+    string exp_email = "^[a-zA-Z0-9\\._-]+@[a-zA-Z0-9\\._-]+.([a-zA-Z]{2,4})$";
+    string email = prepare(pTxt_email->get_text(), exp_email);
 
     if (first_name == "" || last_name == "" || email == "") {
-        pLbl_status->set_text("Action canceled! Fill in all the data!");
+        pLbl_status->set_text("Action canceled! There is invalid data!");
         return;
     }
 
@@ -127,10 +122,14 @@ void Controller::gui_insert()
 void Controller::gui_update()
 {
     string id = pLbl_id->get_text();
-    string email = pTxt_email->get_text();
+    if (id == "") {
+        return;
+    }
 
+    string exp_email = "^[a-zA-Z0-9\\._-]+@[a-zA-Z0-9\\._-]+.([a-zA-Z]{2,4})$";
+    string email = prepare(pTxt_email->get_text(), exp_email);
     if (email == "") {
-        pLbl_status->set_text("Action canceled! Email empty!");
+        pLbl_status->set_text("Action canceled! There is invalid data!");
         return;
     }
 
@@ -145,6 +144,9 @@ void Controller::gui_update()
 void Controller::gui_delete()
 {
     string id = pLbl_id->get_text();
+    if (id == "") {
+        return;
+    }
 
     if (remove_contact(id)) {
         gui_clean();
@@ -164,6 +166,8 @@ void Controller::gui_view()
 
 void Controller::gui_clean()
 {
+    gui_view();
+
     pTxt_first_name->set_sensitive(true);
     pTxt_last_name->set_sensitive(true);
     pTxt_email->set_sensitive(true);
@@ -175,9 +179,10 @@ void Controller::gui_clean()
     pTxt_first_name->set_text("");
     pTxt_last_name->set_text("");
     pTxt_email->set_text("");
-    pLbl_id->set_text("ID");
+
+    pLbl_id->set_text("");
     pLbl_status->set_text("");
-    pLbl_inform->set_text("INSERT a new contact or VIEW the complete list.");
+    pLbl_inform->set_text("Insert a new contact.");
 }
 
 void Controller::gui_select_row_treeView()
@@ -188,7 +193,7 @@ void Controller::gui_select_row_treeView()
 
     pBtn_insert->set_sensitive(false);
     pBtn_update->set_sensitive(true);
-    pBtn_delete->set_sensitive(true);       
+    pBtn_delete->set_sensitive(true);
 
     auto iter = m_TreeSelection->get_selected();
     if(iter) {
@@ -198,18 +203,19 @@ void Controller::gui_select_row_treeView()
         pTxt_last_name->set_text(row[m_Columns.m_col_2]);
         pTxt_email->set_text(row[m_Columns.m_col_3]);
     }
+
     pLbl_inform->set_text("Update email or Remove contact.");
 }
 
 void Controller::gui_update_treeView(vector<vector<string> > result)
 {
+    m_TreeSelection->unselect_all();
+    m_refTreeModel->clear();
+
     if (result.size() < 2) {
         pLbl_status->set_text("No data to display.");
         return;
     }
-
-    m_TreeSelection->unselect_all();
-    m_refTreeModel->clear();
 
     Gtk::TreeModel::Row row;
     for (unsigned int i = 1; i < result.size(); ++i)
@@ -296,4 +302,35 @@ bool Controller::update_contact(string id, string email)
 bool Controller::remove_contact(string id)
 {
     return contacts.remove(stoi(id));
+}
+
+/*
+ * GENERIC FUNCTIONS
+ */
+string Controller::prepare(string value, string exp)
+{
+    if (!regex_match (value, regex(exp))) {
+        return "";
+    }
+
+    char c = ' ';   // space
+    string output = "";
+    while(value.front() == c) {
+        value.erase(0, 1);
+    }
+    while (value.back() == c) {
+        value.erase(value.size() - 1, 1);
+    }
+    for (unsigned int i = 0; i < value.size(); ++i) {
+        output += value[i];
+        while(value[i] == c) {
+            i = i + 1;
+            if (value[i] != c) {
+                output += value[i];
+                break;
+            }
+        }
+    }
+
+    return output;
 }

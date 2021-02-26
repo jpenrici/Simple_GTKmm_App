@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <regex>
 
 using namespace std;
 
@@ -18,6 +19,8 @@ class Controller {
         int Console();
 
     private:
+        string prepare(string value, string exp);
+        
         // MODEL CONTROL
         Contacts contacts;
         bool add_contact(string first_name, string last_name, string email);
@@ -29,9 +32,11 @@ class Controller {
         ConsoleApp console; 
 
         // GUI VIEW CONTROL
+        GUIApp* pGui;
         Gtk::Button* pBtn_insert;
         Gtk::Button* pBtn_update;
         Gtk::Button* pBtn_delete;
+        Gtk::Button* pBtn_clean;          
         Gtk::Label* pLbl_id;
         Gtk::Label* pLbl_inform;
         Gtk::Label* pLbl_status;
@@ -47,7 +52,6 @@ class Controller {
         void gui_delete();
         void gui_view();
         void gui_clean();
-        void gui_clear_treeView();
         void gui_select_row_treeView();
         void gui_update_treeView(vector<vector<string> > result);       
 

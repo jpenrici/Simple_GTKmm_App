@@ -153,21 +153,6 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="btn_insert">
-                    <property name="label" translatable="yes">INSERT</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="margin_left">2</property>
-                    <property name="margin_right">2</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkButton" id="btn_clean">
                     <property name="label" translatable="yes">RESET</property>
                     <property name="visible">True</property>
@@ -200,6 +185,7 @@
             <property name="can_focus">True</property>
             <property name="margin_left">2</property>
             <property name="margin_right">2</property>
+            <property name="reorderable">True</property>
             <property name="enable_grid_lines">both</property>
             <property name="tooltip_column">0</property>
             <child internal-child="selection">
@@ -218,8 +204,8 @@
             <property name="can_focus">False</property>
             <property name="homogeneous">True</property>
             <child>
-              <object class="GtkButton" id="btn_update">
-                <property name="label" translatable="yes">UPDATE</property>
+              <object class="GtkButton" id="btn_insert">
+                <property name="label" translatable="yes">INSERT</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -231,8 +217,8 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="btn_delete">
-                <property name="label" translatable="yes">DELETE</property>
+              <object class="GtkButton" id="btn_update">
+                <property name="label" translatable="yes">UPDATE</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -244,8 +230,8 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="btn_view">
-                <property name="label" translatable="yes">VIEW</property>
+              <object class="GtkButton" id="btn_delete">
+                <property name="label" translatable="yes">DELETE</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
