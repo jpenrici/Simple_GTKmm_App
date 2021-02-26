@@ -19,13 +19,42 @@ class Controller {
         int Console();
 
     private:
+        // REGEX
+        const string EXP_NAME {
+            "^[a-zA-ZãÃâÂáÁàÀäÄẽẼêÊéÉèÈëËĩĨîÎíÍìÌïÏôÔõÕóÓòÒöÖũŨúÚùÙûÛüÜçÇ' ']+$"
+        };
+
+        const string EXP_EMAIL {
+            "^[a-zA-Z0-9\\._-]+@[a-zA-Z0-9\\._-]+.([a-zA-Z]{2,4})$"
+        };
+
+        const string EXP_NUM {"^[0-9]+$"};
+
+        // INFORM
+        const vector<string> INFO {
+            "There's something wrong! Check data.",     // ERROR_UNDEFINED
+            "Successful action!",                       // OK            
+            "There's something wrong! Check name.",     // ERROR_NAME
+            "There's something wrong! Check email.",    // ERROR_EMAIL
+            "There's something wrong! Check id.",       // ERROR_ID
+        };        
+
+        enum Error {
+            ERROR_UNDEFINED,
+            NO_ERROR,
+            ERROR_NAME,
+            ERROR_EMAIL,
+            ERROR_ID,
+        };
+
+        // GENERIC FUNCTIONS
         string prepare(string value, string exp);
         
         // MODEL CONTROL
         Contacts contacts;
-        bool add_contact(string first_name, string last_name, string email);
-        bool update_contact(string id, string email);
-        bool remove_contact(string id);
+        int add_contact(string first_name, string last_name, string email);
+        int update_contact(string id, string email);
+        int remove_contact(string id);
         vector<vector<string> > read_contacts();
 
         // CONSOLE VIEW CONTROL

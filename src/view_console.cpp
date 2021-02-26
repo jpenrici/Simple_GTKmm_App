@@ -2,7 +2,7 @@
 
 string ConsoleApp::menu()
 {
-    string menu = "Contacts: [1] Add [2] Update [3] View [4] Remove [0] Qui";
+    string menu = "Contacts: [1] Add [2] Update [3] View [4] Remove [0] Quit";
 
     int answer;
     string option = "";
@@ -18,16 +18,16 @@ string ConsoleApp::menu()
             break;
         case 2:
             option = "UPDATE";
-            break;          
+            break;
         case 3:
             option = "VIEW";
             break;
         case 4:
             option = "DEL";
-            break;              
+            break;
         case 0:
             option = "QUIT";
-            break;          
+            break;
         default:
             inform("Invalid option.");
     }

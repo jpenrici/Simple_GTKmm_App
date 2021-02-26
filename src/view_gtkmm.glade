@@ -180,16 +180,21 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTreeView" id="treeView">
+          <object class="GtkScrolledWindow" id="scrolled_treeView">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="margin_left">2</property>
-            <property name="margin_right">2</property>
-            <property name="reorderable">True</property>
-            <property name="enable_grid_lines">both</property>
-            <property name="tooltip_column">0</property>
-            <child internal-child="selection">
-              <object class="GtkTreeSelection" id="treeSelection"/>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTreeView" id="treeView">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="reorderable">True</property>
+                <property name="enable_grid_lines">both</property>
+                <property name="tooltip_column">0</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection"/>
+                </child>
+              </object>
             </child>
           </object>
           <packing>
@@ -246,7 +251,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>
@@ -263,7 +268,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">4</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </object>

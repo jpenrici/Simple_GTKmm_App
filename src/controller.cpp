@@ -99,61 +99,38 @@ int Controller::Gui()
 
 void Controller::gui_insert()
 {
-    string exp_name = "^[a-zA-ZãÃâÂáÁàÀäÄẽẼêÊéÉèÈëËĩĨîÎíÍìÌïÏôÔõÕóÓòÒöÖũŨúÚùÙûÛüÜçÇ' ']+$";
-    string first_name = prepare(pTxt_first_name->get_text(), exp_name);
-    string last_name = prepare(pTxt_last_name->get_text(), exp_name);
+    string first_name = prepare(pTxt_first_name->get_text(), EXP_NAME);
+    string last_name = prepare(pTxt_last_name->get_text(), EXP_NAME);
+    string email = prepare(pTxt_email->get_text(), EXP_EMAIL);
+    int result = add_contact(first_name, last_name, email);
 
-    string exp_email = "^[a-zA-Z0-9\\._-]+@[a-zA-Z0-9\\._-]+.([a-zA-Z]{2,4})$";
-    string email = prepare(pTxt_email->get_text(), exp_email);
-
-    if (first_name == "" || last_name == "" || email == "") {
-        pLbl_status->set_text("Action canceled! There is invalid data!");
-        return;
-    }
-
-    if (add_contact(first_name, last_name, email)) {
+    if (result == 1) {
         gui_clean();
-        pLbl_status->set_text("Contact added successfully.");
-    } else {
-        pLbl_status->set_text("Email already exists!");
     }
+    pLbl_status->set_text(INFO[result]);
 }
 
 void Controller::gui_update()
 {
     string id = pLbl_id->get_text();
-    if (id == "") {
-        return;
-    }
+    string email = prepare(pTxt_email->get_text(), EXP_EMAIL);
+    int result = update_contact(id, email);
 
-    string exp_email = "^[a-zA-Z0-9\\._-]+@[a-zA-Z0-9\\._-]+.([a-zA-Z]{2,4})$";
-    string email = prepare(pTxt_email->get_text(), exp_email);
-    if (email == "") {
-        pLbl_status->set_text("Action canceled! There is invalid data!");
-        return;
-    }
-
-    if (update_contact(id, email)) {
+    if (result == 1) {
         gui_clean();
-        pLbl_status->set_text("Contact update successfully.");
-    } else {
-        pLbl_status->set_text("Email already exists!");
     }
+    pLbl_status->set_text(INFO[result]);
 }
 
 void Controller::gui_delete()
 {
     string id = pLbl_id->get_text();
-    if (id == "") {
-        return;
-    }
+    int result = remove_contact(id);
 
-    if (remove_contact(id)) {
+    if (result == 1) {
         gui_clean();
-        pLbl_status->set_text("Email removed successfully.");
-    } else {
-        pLbl_status->set_text("ID not found!");
     }
+    pLbl_status->set_text(INFO[result]);
 }
 
 void Controller::gui_view()
@@ -241,6 +218,7 @@ void Controller::gui_update_treeView(vector<vector<string> > result)
  */
 int Controller::Console()
 {
+    int result;
     string option;
     do {
         option = console.menu();
@@ -248,20 +226,16 @@ int Controller::Console()
 
         if (option == "ADD") {
             values = console.add_contact();
-            if (add_contact(values[0], values[1], values[2])) {
-                console.inform("Contact added successfully.");
-            } else {
-                console.inform("Email already exists!");
-            }
+            result = add_contact(prepare(values[0], EXP_NAME),
+                prepare(values[1], EXP_NAME), prepare(values[2], EXP_EMAIL));
+            console.inform(INFO[result]);
         }
 
         if (option == "UPDATE") {
             values = console.update_contact();
-            if (update_contact(values[0], values[1])) {
-                console.inform("Email update successfully.");
-            } else {
-                console.inform("ID not found or Email already exists!");
-            }           
+            result = update_contact(prepare(values[0], EXP_NUM),
+                prepare(values[1], EXP_EMAIL));
+            console.inform(INFO[result]);         
         }
 
         if (option == "VIEW") {
@@ -269,11 +243,8 @@ int Controller::Console()
         }       
 
         if (option == "DEL") {
-            if (remove_contact(console.remove_contact())) {
-                console.inform("Email removed successfully.");
-            } else {
-                console.inform("ID not found!");
-            }           
+            result = remove_contact(prepare(console.remove_contact(), EXP_NUM));
+            console.inform(INFO[result]);         
         }
 
     } while (option != "QUIT");
@@ -284,8 +255,16 @@ int Controller::Console()
 /* 
  * MODEL CONTROL
  */
-bool Controller::add_contact(string first_name, string last_name, string email)
+int Controller::add_contact(string first_name, string last_name, string email)
 {
+    if (first_name == "" || last_name == "") {
+        return ERROR_NAME;
+    }
+
+    if (email == "") {
+        return ERROR_EMAIL;
+    }
+
     return contacts.add(first_name, last_name, email);
 }
 
@@ -294,13 +273,25 @@ vector<vector<string> > Controller::read_contacts()
     return contacts.read();
 }
 
-bool Controller::update_contact(string id, string email)
+int Controller::update_contact(string id, string email)
 {
+    if (email == "") {
+        return ERROR_EMAIL;
+    }
+
+    if (id == "") {
+        return ERROR_ID;
+    }    
+
     return contacts.update(stoi(id), email);
 }
 
-bool Controller::remove_contact(string id)
+int Controller::remove_contact(string id)
 {
+    if (id == "") {
+        return ERROR_ID;
+    }
+
     return contacts.remove(stoi(id));
 }
 
