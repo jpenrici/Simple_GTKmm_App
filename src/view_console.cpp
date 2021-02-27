@@ -2,7 +2,7 @@
 
 string ConsoleApp::menu()
 {
-    string menu = "Contacts: [1] Add [2] Update [3] View [4] Remove [0] Quit";
+    string menu = "Contacts: [1] Add [2] Update [3] Search [4] View All [5] Remove [0] Quit";
 
     int answer;
     string option = "";
@@ -20,9 +20,12 @@ string ConsoleApp::menu()
             option = "UPDATE";
             break;
         case 3:
-            option = "VIEW";
+            option = "SEARCH";
             break;
         case 4:
+            option = "VIEW";
+            break;            
+        case 5:
             option = "DEL";
             break;
         case 0:
@@ -78,6 +81,15 @@ vector<string> ConsoleApp::update_contact()
     return data;
 }
 
+string ConsoleApp::search_contact()
+{
+    string value;
+    cout << "Keyword search: ";
+    cin >> value;
+
+    return value;
+}
+
 string ConsoleApp::remove_contact()
 {
     string value;
@@ -95,12 +107,16 @@ void ConsoleApp::inform(string text)
 
 void ConsoleApp::view(vector<vector<string> > result)
 {
-    unsigned int len = 15;
+    unsigned int length_default = 15;
     for (unsigned int row = 0; row < result.size(); ++row) {
         for (unsigned int col = 0; col < result[row].size(); ++col) {
-            string v = result[row][col];
-            cout << v.substr(0, v.size() > len ? len : v.size());
-            cout << string(len - v.size(), ' ');
+            string text = result[row][col];
+            unsigned int length_text = text.size();
+            if (length_text >= length_default) {
+                cout << text.substr(0, length_default - 5) << " ... ";
+            } else {
+                cout << text << string(length_default - length_text, ' ');
+            }
         }
         cout << endl;
     }

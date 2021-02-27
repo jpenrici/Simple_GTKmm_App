@@ -25,10 +25,12 @@ int Controller::Gui()
     pBtn_insert = nullptr;
     pBtn_update = nullptr;
     pBtn_delete = nullptr;
+    pBtn_search = nullptr;
     pBtn_clean = nullptr;
     pLbl_id = nullptr;
     pLbl_inform = nullptr;
     pLbl_status = nullptr;
+    pTxt_search = nullptr;
     pTxt_first_name = nullptr;
     pTxt_last_name = nullptr;
     pTxt_email = nullptr;
@@ -38,10 +40,12 @@ int Controller::Gui()
     refBuilder->get_widget("btn_insert", pBtn_insert);
     refBuilder->get_widget("btn_update", pBtn_update);
     refBuilder->get_widget("btn_delete", pBtn_delete);
+    refBuilder->get_widget("btn_search", pBtn_search);
     refBuilder->get_widget("btn_clean", pBtn_clean);
     refBuilder->get_widget("lbl_id", pLbl_id);
     refBuilder->get_widget("lbl_inform", pLbl_inform);
     refBuilder->get_widget("lbl_status", pLbl_status);
+    refBuilder->get_widget("txt_search", pTxt_search);
     refBuilder->get_widget("txt_first_name", pTxt_first_name);
     refBuilder->get_widget("txt_last_name", pTxt_last_name);
     refBuilder->get_widget("txt_email", pTxt_email);
@@ -61,6 +65,11 @@ int Controller::Gui()
         pBtn_delete->signal_clicked().connect(sigc::mem_fun(*this,
             &Controller::gui_delete));
     }
+
+    if (pBtn_search) {
+        pBtn_search->signal_clicked().connect(sigc::mem_fun(*this,
+            &Controller::gui_search));
+    }    
 
     if (pBtn_clean) {
         pBtn_clean->signal_clicked().connect(sigc::mem_fun(*this,
@@ -84,10 +93,12 @@ int Controller::Gui()
     delete pBtn_insert;
     delete pBtn_update;
     delete pBtn_delete;
+    delete pBtn_search;
     delete pBtn_clean;
     delete pLbl_id;
     delete pLbl_inform;
     delete pLbl_status;
+    delete pTxt_search;
     delete pTxt_first_name;
     delete pTxt_last_name;
     delete pTxt_email;
@@ -122,6 +133,23 @@ void Controller::gui_update()
     pLbl_status->set_text(INFO[result]);
 }
 
+void Controller::gui_search()
+{
+    string search = pTxt_search->get_text();
+    vector<vector<string> > result = search_contact("all", search);
+    vector<vector<string> > table {{"ID", "First Name", "Last Name", "Email"}};
+    table.insert(end(table), begin(result), end(result));  
+    gui_update_treeView(table);
+}
+
+void Controller::gui_view()
+{
+    vector<vector<string> > result = read_contacts();
+    vector<vector<string> > table {{"ID", "First Name", "Last Name", "Email"}};
+    table.insert(end(table), begin(result), end(result));  
+    gui_update_treeView(table);
+}
+
 void Controller::gui_delete()
 {
     string id = pLbl_id->get_text();
@@ -131,14 +159,6 @@ void Controller::gui_delete()
         gui_clean();
     }
     pLbl_status->set_text(INFO[result]);
-}
-
-void Controller::gui_view()
-{
-    vector<vector<string> > result = read_contacts();
-    vector<vector<string> > table {{"ID", "First Name", "Last Name", "Email"}};
-    table.insert(end(table), begin(result), end(result));  
-    gui_update_treeView(table);
 }
 
 void Controller::gui_clean()
@@ -192,6 +212,8 @@ void Controller::gui_update_treeView(vector<vector<string> > result)
     if (result.size() < 2) {
         pLbl_status->set_text("No data to display.");
         return;
+    } else {
+        pLbl_status->set_text(to_string(result.size() - 1) + " values found.");
     }
 
     Gtk::TreeModel::Row row;
@@ -210,7 +232,7 @@ void Controller::gui_update_treeView(vector<vector<string> > result)
         pTreeView->append_column(result[0][1], m_Columns.m_col_1);
         pTreeView->append_column(result[0][2], m_Columns.m_col_2);
         pTreeView->append_column(result[0][3], m_Columns.m_col_3);
-    }
+    } 
 }
 
 /* 
@@ -237,6 +259,10 @@ int Controller::Console()
                 prepare(values[1], EXP_EMAIL));
             console.inform(INFO[result]);         
         }
+
+        if (option == "SEARCH") {
+            console.view_contacts(search_contact("all", console.search_contact()));
+        }          
 
         if (option == "VIEW") {
             console.view_contacts(read_contacts());
@@ -266,6 +292,17 @@ int Controller::add_contact(string first_name, string last_name, string email)
     }
 
     return contacts.add(first_name, last_name, email);
+}
+
+vector<vector<string> > Controller::search_contact(string field, string value)
+{
+    vector<vector<string> > result;
+    if (field == "" || value == "") {
+        result.clear();
+        return result;
+    }
+
+    return contacts.search(field, value);
 }
 
 vector<vector<string> > Controller::read_contacts()

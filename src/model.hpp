@@ -14,6 +14,7 @@ class Contacts {
         ~Contacts();
 
         bool add(string first_name, string last_name, string email);
+        vector<vector<string> > search(string field, string value);
         vector<vector<string> > read(string field, string value);
         vector<vector<string> > read(int id);
         vector<vector<string> > read();

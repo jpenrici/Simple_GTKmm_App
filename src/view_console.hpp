@@ -13,6 +13,7 @@ class ConsoleApp
         vector<string> add_contact();
         void view_contacts(vector<vector<string> > result);
         vector<string> update_contact();
+        string search_contact();
         string remove_contact();
         void inform(string text);
 

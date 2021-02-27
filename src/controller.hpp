@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <regex>
+#include <set>
 
 using namespace std;
 
@@ -56,6 +57,7 @@ class Controller {
         int update_contact(string id, string email);
         int remove_contact(string id);
         vector<vector<string> > read_contacts();
+        vector<vector<string> > search_contact(string field, string value);
 
         // CONSOLE VIEW CONTROL
         ConsoleApp console; 
@@ -65,10 +67,12 @@ class Controller {
         Gtk::Button* pBtn_insert;
         Gtk::Button* pBtn_update;
         Gtk::Button* pBtn_delete;
-        Gtk::Button* pBtn_clean;          
+        Gtk::Button* pBtn_search;
+        Gtk::Button* pBtn_clean;
         Gtk::Label* pLbl_id;
         Gtk::Label* pLbl_inform;
         Gtk::Label* pLbl_status;
+        Gtk::SearchEntry* pTxt_search;
         Gtk::Entry* pTxt_first_name;
         Gtk::Entry* pTxt_last_name;
         Gtk::Entry* pTxt_email;
@@ -79,6 +83,7 @@ class Controller {
         void gui_insert();
         void gui_update();
         void gui_delete();
+        void gui_search();
         void gui_view();
         void gui_clean();
         void gui_select_row_treeView();

@@ -16,6 +16,10 @@ Contacts::~Contacts()
 
 bool Contacts::add(string first_name, string last_name, string email)
 {
+    if (first_name == "" || last_name == "" || email == "") {
+        return false;
+    }
+
     if (read("email", email).size() != 0) {
         return false;
     }
@@ -27,8 +31,47 @@ bool Contacts::add(string first_name, string last_name, string email)
     return true;
 }
 
+vector<vector<string> > Contacts::search(string field, string value)
+{
+    vector<vector<string> > result;
+    if (field == "" || value == "") {
+        result.clear();
+        return result;
+    }
+
+    string sql;
+    if (field == "name") {
+        sql = "SELECT * FROM Contacts ";
+        sql += "WHERE first_name LIKE '%" + value + "%' ";
+        sql += "OR last_name LIKE '%" + value + "%';";
+    } else if (field == "email") {
+        sql = "SELECT * FROM Contacts WHERE email LIKE '%" + value + "%';";
+    } else if (field == "all") {
+        sql = "SELECT * FROM Contacts ";
+        sql += "WHERE first_name LIKE '%" + value + "%' ";
+        sql += "OR last_name LIKE '%" + value + "%' ";
+        sql += "OR email LIKE '%" + value + "%';";
+    } else {
+        result.clear();
+        return result;
+    }
+
+    return conn.command(database, sql.c_str());
+}
+
 vector<vector<string> > Contacts::read(string field, string value)
 {
+    vector<vector<string> > result;
+    if (field == "" || value == "") {
+        result.clear();
+        return result;
+    }
+
+    if (field != "first_name" && field != "last_name" && field != "email") {
+        result.clear();
+        return result;
+    }
+
     string sql = "SELECT * FROM Contacts WHERE " + field + "='" + value + "';";
     return conn.command(database, sql.c_str());
 }
