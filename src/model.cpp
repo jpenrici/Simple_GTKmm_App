@@ -67,7 +67,8 @@ vector<vector<string> > Contacts::read(string field, string value)
         return result;
     }
 
-    if (field != "first_name" && field != "last_name" && field != "email") {
+    if (field != "ID" && field != "first_name" && field != "last_name" &&
+        field != "email") {
         result.clear();
         return result;
     }
@@ -107,7 +108,7 @@ bool Contacts::remove(int id)
 {
     if (read(id).size() == 0) {
         return false;
-    }   
+    }
 
     string sql = "DELETE from Contacts where ID=" + to_string(id) + ";";
     conn.command(database, sql.c_str());
